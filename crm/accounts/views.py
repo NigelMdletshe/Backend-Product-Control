@@ -4,7 +4,7 @@ from django.forms import inlineformset_factory
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-
+from django.contrib.auth.models import Group
 from .models import *
 from .forms import OrderForm, CreateUserForm
 from .filters import OrderFilter
@@ -20,8 +20,10 @@ def registerPage(request):
     if request.method == 'POST':
         form = CreateUserForm(request.POST)
         if form.is_valid():
-            form.save()
-            user=form.cleaned_data.get('username')
+            user= form.save()
+            username=form.cleaned_data.get('username')
+            group = Group.objects.get(name='customer')
+            user.groups.add(group)
             messages.success(request,'Account was created for '+ user)
             return redirect('login')
         
